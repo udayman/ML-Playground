@@ -3,12 +3,12 @@ import numpy as np
 #Showcasing Broadcasting
 # weighted sums
 X = np.array([[1,2],[3,4],[5,6]]) # (3,2) array
-w = np.aray([0.1,0.2]) #(2,) array
+w = np.array([0.1,0.2]) #(2,) array
 
 # produce a (3,2) array
 weightedFeatures = X * w
 # todo, use the einsum here
-weightedFeaturesEinsum = np.einsum('ij,j->ij')
+weightedFeaturesEinsum = np.einsum('ij,j->ij',X,w)
 
 # produce an array summing over all the cols to form a (3,) array
 yPred = np.sum(weightedFeatures, axis=1)
@@ -39,7 +39,22 @@ print("Final output")
 print(output)
 
 # do softmax here
-expVals = np.exp(output)
+def softmax(X):
+    # take max of elements for normalization
+    # Keep dims to preserve (N,1)
+    rowMax = np.max(X, axis=1, keepdims=True)
 
+    # subtract the max from each element
+    # broadcasting of (N,D) - (N,1) works here
+    subtractedMax = X - rowMax
 
+    # take exponent of each element, by passing in np.exp function
+    exps = np.exp(subtractedMax)
+
+    # divide by the row sum, which we compute using np.sum and keep dims for (N,1)
+    rowSum = np.sum(exps, axis=1, keepdims=True)
+    return exps / rowSum
+
+print("softmax here")
+print(softmax(output))
 
